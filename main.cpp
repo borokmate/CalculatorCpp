@@ -7,7 +7,7 @@
 bool Contains(std::vector<char> &list, const char &c);
 int IndexOf(std::vector<char> &list, const char &c);
 int GetOperatorValue(const char &op);
-int Calculate(const char &first, const char &second, const char &op);
+int Calculate(const std::string &first, const std::string &second, const char &op);
 
 
 int main()
@@ -15,46 +15,66 @@ int main()
     std::cout << "Type your equation: ";
     std::string input;
     getline(std::cin, input);
-    std::stack<char> operators;
-    std::string output;
+    std::vector<std::string> equation;
+    std::string temp;
     std::vector<char> opList = { '+', '-', '/', '*', '^', '(', ')'};
     for (const char ch : input)
     {
-        if (ch == ' ') continue;
         if (Contains(opList, ch))
         {
+            if (!temp.empty())
+                equation.push_back(temp);
+            equation.push_back(std::string(1, ch));
+            temp.clear();
+        }
+        else
+        {
+            temp += ch;
+        }
+       
+    }
+    if (!temp.empty())
+        equation.push_back(temp);   
+    std::stack<char> operators;
+    std::vector<std::string> output;
+    for (const std::string str : equation)
+    {
+        // std::cout << str << " ";
+        if (str[0] == ' ') continue;
+        if (Contains(opList, str[0]))
+        {
+            char op = str[0];
             if (operators.empty())
             {
-                operators.push(ch);
+                operators.push(op);
                 continue;
             }
-            if (ch == '(')
+            if (op == '(')
             {
-                operators.push(ch);
+                operators.push(op);
                 continue;
             }
-            if (ch == ')')
+            if (op == ')')
             {
                 while (operators.top() != '(')
                 {
-                    output += operators.top();
+                    output.push_back(std::string(1, operators.top()));
                     operators.pop();
                 }
                 operators.pop();
                 continue;
             }
-            while (GetOperatorValue(ch) <= GetOperatorValue(operators.top()) && GetOperatorValue(operators.top()) != 4)
+            while (GetOperatorValue(op) <= GetOperatorValue(operators.top()) && GetOperatorValue(operators.top()) != 4)
             {
-                std::cout << "Current: " << ch << "\nPops: " << operators.top() << std::endl;
-                output += operators.top();
+                output.push_back(std::string(1, operators.top()));
                 operators.pop();
                 if (operators.empty()) break;
             }
-            operators.push(ch);
+            operators.push(op);
         }
         else
         {
-            output += ch;
+            output.push_back(str);
         }
     }
 
@@ -62,22 +82,29 @@ int main()
 
     while (!operators.empty())
     {
-        output += operators.top();
+        output.push_back(std::string(1, operators.top()));
         operators.pop();
     }
 
-    std::cout << "I LOVE POLAND: " << output << std::endl;
+    std::cout << std::endl;
 
-    for (int i = 2; i < output.length(); i++)
+    std::cout << "I LOVE POLAND: " << output.size() << " ";
+    for (const std::string &s : output)
     {
-        if (Contains(opList, output[i]))
+        std::cout << s;
+    }
+    std::cout << std::endl;
+
+    for (int i = 2; i < output.size(); i++)
+    {
+        if (Contains(opList, output[i][0]))
         {
-            output.replace(i - 2, i, std::to_string(Calculate(output[i - 2], output[i - 1], output[i])));
-            std::cout << "buh?: " << output << std::endl;
+            output.erase(output.begin() + i - 2, output.begin() + i);
+            output.insert(output.begin() + i - 2, std::to_string(Calculate(output[i - 2], output[i - 1], output[i][0])));
             i = 2;
         }
     }
-    std::cout << "I LOVE POLAND 2: " << output << std::endl;
+    std::cout << "I LOVE POLAND 2: " << "waho" << std::endl;
     return 0;
 }
 
@@ -126,7 +153,6 @@ int Calculate(const std::string &first, const std::string &second, const char &o
     switch (op)
     {
         case '+':
-            
             return std::stoi(first) + std::stoi(second); 
         case '-':
             return std::stoi(first) - std::stoi(second); 
@@ -139,4 +165,5 @@ int Calculate(const std::string &first, const std::string &second, const char &o
         default:
             break;
     }
+    return -1;
 }
