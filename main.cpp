@@ -7,19 +7,21 @@
 bool Contains(std::vector<char> &list, const char &c);
 int IndexOf(std::vector<char> &list, const char &c);
 int GetOperatorValue(const char &op);
-int Calculate(const std::string &first, const std::string &second, const char &op);
+double Calculate(const std::string &first, const std::string &second, const char &op);
 
 
 int main()
 {
     std::cout << "Type your equation: ";
-    std::string input;
-    getline(std::cin, input);
+    std::string input = "3 + 4 * 2 / ( 1 - 5 ) ^ 2 ^ 3";
+    // getline(std::cin, input);
     std::vector<std::string> equation;
     std::string temp;
     std::vector<char> opList = { '+', '-', '/', '*', '^', '(', ')'};
     for (const char ch : input)
     {
+        if (ch == ' ')
+            continue;
         if (Contains(opList, ch))
         {
             if (!temp.empty())
@@ -35,12 +37,17 @@ int main()
     }
     if (!temp.empty())
         equation.push_back(temp);   
+    std::cout << "Equation: ";
+    for (const std::string &str : equation)
+    {
+        std::cout << str << ", ";
+    }
+    std::cout << std::endl;
     std::stack<char> operators;
     std::vector<std::string> output;
     for (const std::string str : equation)
     {
         // std::cout << str << " ";
-        if (str[0] == ' ') continue;
         if (Contains(opList, str[0]))
         {
             char op = str[0];
@@ -74,6 +81,7 @@ int main()
         }
         else
         {
+            
             output.push_back(str);
         }
     }
@@ -88,10 +96,10 @@ int main()
 
     std::cout << std::endl;
 
-    std::cout << "I LOVE POLAND: " << output.size() << " ";
+    std::cout << "I LOVE POLAND: ";
     for (const std::string &s : output)
     {
-        std::cout << s;
+        std::cout << s << ", ";
     }
     std::cout << std::endl;
 
@@ -99,12 +107,19 @@ int main()
     {
         if (Contains(opList, output[i][0]))
         {
-            output.erase(output.begin() + i - 2, output.begin() + i);
-            output.insert(output.begin() + i - 2, std::to_string(Calculate(output[i - 2], output[i - 1], output[i][0])));
+            std::string replacement = std::to_string(Calculate(output[i - 2], output[i - 1], output[i][0]));
+            output.erase(output.begin() + i - 2, output.begin() + i + 1);
+            output.insert(output.begin() + i - 2, replacement);
             i = 2;
+            std::cout << "Replacing: ";
+            for (const std::string &s : output)
+            {
+                std::cout << s << " ";
+            }
+            std::cout << std::endl;
         }
     }
-    std::cout << "I LOVE POLAND 2: " << "waho" << std::endl;
+    std::cout << "I LOVE POLAND 2: " << output[0] << std::endl;
     return 0;
 }
 
@@ -148,22 +163,23 @@ int GetOperatorValue(const char &op)
     return -1;
 }
 
-int Calculate(const std::string &first, const std::string &second, const char &op)
+double Calculate(const std::string &first, const std::string &second, const char &op)
 {
+    std::cout << "Calculating: " << first << " " << second << std::endl;
     switch (op)
     {
         case '+':
-            return std::stoi(first) + std::stoi(second); 
+            return std::stod(first) + std::stod(second); 
         case '-':
-            return std::stoi(first) - std::stoi(second); 
+            return std::stod(first) - std::stod(second); 
         case '/':
-            return std::stoi(first) / std::stoi(second); 
+            return std::stod(first) / std::stod(second); 
         case '*':
-            return std::stoi(first) * std::stoi(second); 
+            return std::stod(first) * std::stod(second); 
         case '^':
-            return pow(std::stoi(first), std::stoi(second)); 
+            return pow(std::stod(first), std::stod(second)); 
         default:
             break;
     }
-    return -1;
+    return -1.0;
 }
