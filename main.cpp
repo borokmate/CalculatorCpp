@@ -105,12 +105,12 @@ int main()
 
     for (int i = 2; i < output.size(); i++)
     {
-        if (Contains(opList, output[i][0]))
+        if (Contains(opList, output[i][0]) && output[i].size() == 1)
         {
             std::string replacement = std::to_string(Calculate(output[i - 2], output[i - 1], output[i][0]));
             output.erase(output.begin() + i - 2, output.begin() + i + 1);
             output.insert(output.begin() + i - 2, replacement);
-            i = 2;
+            i = 1;
             std::cout << "Replacing: ";
             for (const std::string &s : output)
             {
@@ -177,6 +177,7 @@ double Calculate(const std::string &first, const std::string &second, const char
         case '*':
             return std::stod(first) * std::stod(second); 
         case '^':
+            // std::string << pow(std::stod(first), std::stod(second))
             return pow(std::stod(first), std::stod(second)); 
         default:
             break;
